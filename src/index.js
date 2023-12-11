@@ -53,10 +53,11 @@ const addTask = text => {
   }
 }
 
+
 const removeTask = id => {
   return {
     type: 'REMOVE_TASK',
-    id
+    id: parseInt(id, 10)
   }
 }
 const initialState = {
@@ -77,13 +78,13 @@ const reducer = (state = initialState, action) => {
           },
         ],
       };
-      case 'REMOVE_TASK':
-        return {
-          ...state,
-          todos: state.todos.filter(task => task.id !== action.id),
-        };
-      default:
-        return state;
+    case 'REMOVE_TASK':
+      return {
+        ...state,
+        todos: state.todos.filter(task => task.id !== action.id),
+      };
+    default:
+      return state;
   }
 }
 const store = createStore(reducer)
@@ -97,27 +98,34 @@ document.getElementById('addTaskBtn').addEventListener('click', () => {
   }
 });
 
-document.getElementById('killTaskBtn').addEventListener('click', (event) => {
-  const taskID = event.currentTarget.getAttribute('data-id');
-  console.log(taskID);
-  store.dispatch(removeTask(taskID));
+document.getElementById('taskList').addEventListener('click', (event) => {
+  console.log(initialState)
+  if (event.target.classList.contains('killTaskBtn')) {
+    const taskID = event.target.parentElement.getAttribute('data-id');
+    store.dispatch(removeTask(taskID));
+  }
 });
 
+// Вміст функції render
 const render = () => {
   const taskList = document.getElementById('taskList');
   taskList.innerHTML = ''; // Очистка списку перед відображенням нового стану
 
   store.getState().todos.forEach(task => {
     const listItem = document.createElement('li');
-    const killbtn = document.createElement('button')
+    const killbtn = document.createElement('button');
     listItem.textContent = task.text;
-    killbtn.textContent = 'Kill btn'
-    killbtn.className = 'killTaskBtn'
-    listItem.setAttribute('data-id', task.id)
+    killbtn.textContent = 'Kill btn';
+    killbtn.className = 'killTaskBtn';
+    listItem.setAttribute('data-id', task.id);
     taskList.appendChild(listItem);
-    listItem.appendChild(killbtn)
+    listItem.appendChild(killbtn);
   });
+
+
 };
+
+
 
 store.subscribe(render); // Оновлення відображення при зміні стану
 
